@@ -1,8 +1,10 @@
 package com.example.absentee
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.provider.CalendarContract.Colors
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -39,7 +41,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AbsenteeTheme {
-                TodayScreen()
+                TodayScreen(applicationContext)
             }
         }
     }
@@ -47,7 +49,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TodayScreen() {
+fun TodayScreen(context: Context) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -60,7 +62,9 @@ fun TodayScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(Color.Blue),
                 navigationIcon = {
                     IconButton(
-                        onClick = {}
+                        onClick = {
+                            Toast.makeText(context, "Back", Toast.LENGTH_SHORT).show()
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
