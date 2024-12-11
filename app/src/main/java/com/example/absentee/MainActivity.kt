@@ -9,13 +9,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.absentee.ui.theme.AbsenteeTheme
 import androidx.compose.material3.TopAppBar as TopAppBar1
 
@@ -40,42 +49,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             AbsenteeTheme {
-                TodayScreen(applicationContext)
-            }
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun TodayScreen(context: Context) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Back",
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(Color.Blue),
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Toast.makeText(context, "Back", Toast.LENGTH_SHORT).show()
+                NavHost(
+                    navController = navController,
+                    startDestination = "TodayScreen"
+                ) {
+                    composable("TodayScreen"){
+
+                        TodayScreen(applicationContext) {
+                            navController.navigate("WeekScreen")
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
+                    }
+                    composable("WeekScreen"){
+                        WeekScreen(applicationContext) {
+                            navController.navigate("TodayScreen"){
+                                popUpTo("TodayScreen"){
+                                    inclusive = true
+                                }
+                            }
+                        }
                     }
                 }
-            )
+            }
         }
-    ) {
     }
 }
