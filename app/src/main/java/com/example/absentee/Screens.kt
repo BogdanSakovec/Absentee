@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -37,7 +40,6 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TodayScreen(context: Context,onClick: () -> Unit) {
     Scaffold(
-
         topBar = {
             TopAppBar(
                 title = {
@@ -70,7 +72,6 @@ fun TodayScreen(context: Context,onClick: () -> Unit) {
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = "Forward")
                 },
-
                 onClick = {
                     onClick()
                 }
@@ -120,7 +121,6 @@ fun WeekScreen(context: Context,onClick: () -> Unit) {
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = "Forward")
                 },
-
                 onClick = {
                     onClick()
                 }
@@ -133,16 +133,29 @@ fun WeekScreen(context: Context,onClick: () -> Unit) {
             fontSize = 30.sp,
             modifier = Modifier.padding(it)
         )
-        Spacer(modifier = Modifier.height(30.dp).background(color = Color.Red))
+    }
+}
+@Composable
+fun CityScreen(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+        ) {
+        Text(
+            text = "CityScreen",
+            fontSize = 30.sp
+        )
+        Spacer(modifier = Modifier.height(30.dp))
         Button(
             onClick = {
                 onClick()
-            },
-            colors = ButtonDefaults.buttonColors(Color.Black)
+
+            }
         ) {
-            Text(text = "TodayScreen",
-                color = Color.White
-                )
+            Text(text = "TodayScreen")
         }
+
+
     }
 }

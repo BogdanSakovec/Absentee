@@ -56,16 +56,23 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = "TodayScreen"
                 ) {
-                    composable("TodayScreen"){
+                    composable("todayScreen"){
 
                         TodayScreen(applicationContext) {
-                            navController.navigate("WeekScreen")
+                            navController.navigate("weekScreen")
                         }
                     }
-                    composable("WeekScreen"){
+                    composable("weekScreen"){
+
                         WeekScreen(applicationContext) {
-                            navController.navigate("TodayScreen"){
-                                popUpTo("TodayScreen"){
+                            navController.navigate("cityScreen")
+                        }
+                    }
+                    composable("cityScreen"){
+                        CityScreen {
+
+                            navController.navigate("todayScreen"){
+                                popUpTo("todayScreen"){
                                     inclusive = true
                                 }
                             }
