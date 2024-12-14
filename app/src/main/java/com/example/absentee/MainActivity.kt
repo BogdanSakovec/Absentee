@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("todayScreen"){
 
-                        TodayScreen(applicationContext) {
+                        TodayScreen() {
                             navController.navigate("weekScreen")
                         }
                     }

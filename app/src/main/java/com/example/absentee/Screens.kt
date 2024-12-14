@@ -35,54 +35,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
 @Composable
-fun TodayScreen(context: Context,onClick: () -> Unit) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Back",
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(titleContentColor = Color.DarkGray,
-                    containerColor =Color.Red),
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Toast.makeText(context, "Back", Toast.LENGTH_SHORT).show()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                content = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Forward")
-                },
-                onClick = {
-                    onClick()
-                }
-            )
-        },
-    ) {
-        Text(
-            text = "TodayScreen",
-            fontSize = 30.sp,
-            modifier = Modifier.padding(it)
-        )
+fun TodayScreen(onClick: () -> Unit) {
+    Text(text = "TodayScreen", fontSize = 30.sp)
+    Column(modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+    ) {Spacer(modifier = Modifier.height(30.dp))
+        Button(onClick = {onClick()}
+        ) {Text(text = "WeekScreen")}
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,7 +103,7 @@ fun CityScreen(onClick: () -> Unit) {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-        ) {
+    ) {
         Text(
             text = "CityScreen",
             fontSize = 30.sp
@@ -155,7 +117,8 @@ fun CityScreen(onClick: () -> Unit) {
         ) {
             Text(text = "TodayScreen")
         }
-
-
     }
 }
+
+
+
