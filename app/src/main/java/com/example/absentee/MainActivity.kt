@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -50,33 +52,24 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
+
             AbsenteeTheme {
+                NavHost(navController = navController,
+                    startDestination = "todayScreen")
 
-                NavHost(
-                    navController = navController,
-                    startDestination = "TodayScreen"
-                ) {
-                    composable("todayScreen"){
+                { composable("todayScreen")
+                { TodayScreen {
+                    navController.navigate("weekScreen") } }
 
-                        TodayScreen() {
-                            navController.navigate("weekScreen")
-                        }
-                    }
-                    composable("weekScreen"){
+                  composable("weekScreen")
+                { WeekScreen {
+                    navController.navigate("cityScreen") } }
 
-                        WeekScreen(applicationContext) {
-                            navController.navigate("cityScreen")
-                        }
-                    }
-                    composable("cityScreen"){
-                        CityScreen {
+                  composable("cityScreen")
+                { CityScreen {
+                    navController.navigate("todayScreen")
 
-                            navController.navigate("todayScreen"){
-                                popUpTo("todayScreen"){
-                                    inclusive = true
-                                }
-                            }
-                        }
+                    { popUpTo("today"){ inclusive = true } } }
                     }
                 }
             }
