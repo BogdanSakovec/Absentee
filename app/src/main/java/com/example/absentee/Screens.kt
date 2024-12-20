@@ -33,26 +33,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun TodayScreen(onClick: () -> Unit) {
-     Text(text = "TodayScreen", fontSize = 30.sp,
-         modifier = Modifier.padding(60.dp))
-        Button(onClick = { onClick() },
-            modifier = Modifier.padding(100.dp))
-        { Text(text = "WeekScreen") }
+fun TodayScreen() {
+     Text(text = "TodayScreen", fontSize = 30.sp,)
 }
 @Composable
-fun WeekScreen(onClick: () -> Unit) {
-     Text(text = "WeekScreen", fontSize = 30.sp,
-         modifier = Modifier.padding(60.dp))
-        Button(onClick = { onClick() },
-            modifier = Modifier.padding(100.dp))
-        { Text(text = "CityScreen") }
+fun WeekScreen() {
+     Text(text = "WeekScreen", fontSize = 30.sp,)
 }
 @Composable
-fun CityScreen(onClick: () -> Unit) {
-     Text(text = "CityScreen", fontSize = 30.sp,
-         modifier = Modifier.padding(60.dp))
-        Button(onClick = { onClick() },
-            modifier = Modifier.padding(100.dp))
-        { Text(text = "TodayScreen") }
+fun CityScreen() {
+     Text(text = "CityScreen", fontSize = 30.sp,)
 }

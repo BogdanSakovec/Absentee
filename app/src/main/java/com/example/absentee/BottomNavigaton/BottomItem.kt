@@ -20,7 +20,7 @@ object NavBarItems {
 }
 
 sealed class NavRoutes(val route: String) {
-    object TodayScreen: NavRoutes("сьогодні")
-    object WeekScreen: NavRoutes("тиждень")
-    object CityScreen: NavRoutes("міста")
+    object TodayScreen: NavRoutes("TodayScreen")
+    object WeekScreen: NavRoutes("WeekScreen")
+    object CityScreen: NavRoutes("CityScreen")
 }
