@@ -43,6 +43,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.absentee.BottomNavigaton.BottomNavigationBar
+import com.example.absentee.BottomNavigaton.NavRoutes
 import com.example.absentee.ui.theme.AbsenteeTheme
 import androidx.compose.material3.TopAppBar as TopAppBar1
 
@@ -51,28 +53,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navController = rememberNavController()
-
-            AbsenteeTheme {
-                NavHost(navController = navController,
-                    startDestination = "todayScreen")
-
-                { composable("todayScreen")
-                { TodayScreen {
-                    navController.navigate("weekScreen") } }
-
-                  composable("weekScreen")
-                { WeekScreen {
-                    navController.navigate("cityScreen") } }
-
-                  composable("cityScreen")
-                { CityScreen {
-                    navController.navigate("todayScreen")
-
-                    { popUpTo("today"){ inclusive = true } } }
-                    }
-                }
-            }
+            Main()
         }
+    }
+}
+
+@Composable
+fun Main(){
+    val navController = rememberNavController()
+    Column(Modifier.padding(8.dp)) {
+        NavHost(navController, startDestination = NavRoutes.TodayScreen.route,
+            modifier = Modifier.weight(1f) ) {
+
+            composable(NavRoutes.TodayScreen.route) { TodayScreen() }
+            composable(NavRoutes.TodayScreen.route) { WeekScreen() }
+            composable(NavRoutes.TodayScreen.route) { CityScreen() }
+        }
+        BottomNavigationBar(navController = navController)
     }
 }
