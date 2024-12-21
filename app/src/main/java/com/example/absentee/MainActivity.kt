@@ -1,49 +1,21 @@
 package com.example.absentee
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
-import android.provider.CalendarContract.Colors
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,8 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.absentee.ui.theme.AbsenteeTheme
-import androidx.compose.material3.TopAppBar as TopAppBar1
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,7 +67,7 @@ fun BottomNavigationBar(navController: NavController) {
                     }
                 },
                 icon = {
-                    Icon(imageVector = navItem.image,
+                    Icon(painter = painterResource(id = navItem.image),
                         contentDescription = navItem.title)
                 },
                 label = {
@@ -111,17 +81,17 @@ fun BottomNavigationBar(navController: NavController) {
 object NavBarItems {
     val BarItems = listOf(
         BarItem(
-            title = "Today",
-            image = Icons.Filled.Warning,
+            title = "сьогодні",
+            image = R.drawable.baseline_today_24,
             route = "today"),
         BarItem(
-            title = "Week",
-            image = Icons.Filled.Info,
+            title = "тиждень",
+            image = R.drawable.baseline_ballot_24,
             route = "week"
         ),
         BarItem(
-            title = "City",
-            image = Icons.Filled.LocationOn,
+            title = "міста",
+            image = R.drawable.baseline_wrong_location_24,
             route = "city"
         )
     )
@@ -129,21 +99,23 @@ object NavBarItems {
 
 data class BarItem(
     val title: String,
-    val image: ImageVector,
+    val image: Int,
     val route: String)
 
 @Composable
 fun Today() {
-    Text(text = "Today Screen", fontSize = 30.sp,)
+    Text(text = "Сьогодні", fontSize = 30.sp,)
 }
 @Composable
 fun Week() {
-    Text(text = "Week Screen", fontSize = 30.sp,)
+    Text(text = "Тиждень", fontSize = 30.sp,)
 }
 @Composable
 fun City() {
-    Text(text = "City Screen", fontSize = 30.sp,)
+    Text(text = "Міста", fontSize = 30.sp,)
 }
+
+
 
 sealed class NavRoutes(val route: String) {
     object TodayScreen: NavRoutes("today")
