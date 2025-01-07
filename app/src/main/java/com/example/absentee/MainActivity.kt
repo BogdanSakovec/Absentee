@@ -1,28 +1,86 @@
 package com.example.absentee
 
+import android.app.ActionBar.Tab
+import android.content.ClipData.Item
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -32,48 +90,25 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Main()
+            Main ()
+
         }
     }
 }
-
 @Composable
-fun Main(){
+fun Main() {
     val navController = rememberNavController()
-    val townes = listOf(
-        Town(21001, "Vinnytsia", 661),
-        Town(40000, "Sumy", 369),
-        Town(36000, "Poltava", 850),
-        Town(65003, "Odesa", 230),
-        Town(54001, "Mykolaiv", 235),
-        Town(79000, "Lviv", 768),
-        Town(76002, "Ivano-Frankivsk", 362),
-        Town(69001, "Zaporozhye", 952),
-        Town(88000, "Uzhhorod", 1131),
-        Town(10001, "Zhytomyr", 1140),
-        Town(49000, "Dnipro", 248),
-        Town(1001, "Kyiv", 1542),
-        Town(61000, "Kharkiv", 357),
-        Town(43000, "Lutsk", 939)
-    )
     Column(Modifier.padding(8.dp)) {
-        NavHost(navController,
-            startDestination = NavRoutes.Today.route,
-            modifier = Modifier.weight(1f) ) {
-
-            composable(NavRoutes.Today.route) {}
-            composable(NavRoutes.Week.route) { Week() }
-            composable(NavRoutes.City.route) { City(townes, navController) }
-            composable(NavRoutes.Today.route + "/{todayId}",
-                arguments = listOf(navArgument("todayId") {type = NavType.IntType})) {
-                stackEntry ->
-                    val todayId = stackEntry.arguments?.getInt("todayId")
-                    Today(todayId, townes)
-            }
+        NavHost(navController, startDestination = NavRoutes.
+        Add.route, modifier = Modifier.weight(1f)) {
+            composable(NavRoutes.Add.route) { Add() }
+            composable(NavRoutes.Weather.route) { Weather() }
+            composable(NavRoutes.City.route) { City() }
         }
         BottomNavigationBar(navController = navController)
     }
@@ -86,7 +121,8 @@ fun BottomNavigationBar(navController: NavController) {
         val currentRoute = backStackEntry?.destination?.route
 
         NavBarItems.BarItems.forEach { navItem ->
-            NavigationBarItem(selected = currentRoute == navItem.route,
+            NavigationBarItem(
+                selected = currentRoute == navItem.route,
                 onClick = {
                     navController.navigate(navItem.route) {
                         popUpTo(navController.graph.findStartDestination().id)
@@ -96,7 +132,7 @@ fun BottomNavigationBar(navController: NavController) {
                     }
                 },
                 icon = {
-                    Icon(painter = painterResource(id = navItem.image),
+                    Icon(imageVector = navItem.image,
                         contentDescription = navItem.title)
                 },
                 label = {
@@ -110,64 +146,81 @@ fun BottomNavigationBar(navController: NavController) {
 object NavBarItems {
     val BarItems = listOf(
         BarItem(
-            title = "сьогодні",
-            image = R.drawable.baseline_today_24,
-            route = "today"),
-        BarItem(
-            title = "тиждень",
-            image = R.drawable.baseline_ballot_24,
-            route = "week"
+            title = "Add",
+            image = Icons.Filled.Add,
+            route = "Add"
         ),
         BarItem(
-            title = "міста",
-            image = R.drawable.baseline_wrong_location_24,
-            route = "city"
-        )
+            title = "Weather",
+            image = Icons.Filled.Star,
+            route = "Weather"
+        ),
+        BarItem(
+            title = "City",
+            image = Icons.Filled.LocationOn,
+            route = "City"
+        ),
     )
 }
 
 data class BarItem(
     val title: String,
-    val image: Int,
-    val route: String)
-data class Town(val id:Int, val name:String, val age:Int)
+    val image: ImageVector,
+    val route: String
+)
 
 @Composable
-fun Today(todayId:Int?, data: List<Town>) {
-    val today = data.find { it.id==todayId }
-    if(today!=null) {
-        Column {
-            Text("Id: ${today.id}", Modifier.padding(8.dp), fontSize = 22.sp)
-            Text("Name: ${today.name}", Modifier.padding(8.dp), fontSize = 22.sp)
-            Text("Age: ${today.age}", Modifier.padding(8.dp), fontSize = 22.sp)
-        }
-    }
-    else{
-        Text("Town Not Found")
+fun Add(){
+    Text("Add Page", fontSize = 30.sp)
+    val message = remember { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ){
+        Text(message.value, fontSize = 28.sp)
+        TextField(
+            value = message.value,
+            textStyle = TextStyle(fontSize = 25.sp),
+            onValueChange = {newText -> message.value = newText}
+        )
     }
 }
 @Composable
-fun Week() {
-    Text(text = "Тиждень", fontSize = 30.sp,)
+fun Weather(){
+    Text("Weather Page", fontSize = 30.sp)
 }
 @Composable
-fun City(data: List<Town>, navController: NavController) {
-    LazyColumn {
-        items(data){
-            u->
-                Row(Modifier.fillMaxWidth()){
-                    Text(u.name,
-                        Modifier.padding(8.dp). clickable
-                        { navController.navigate("today/${u.id}") },
-                        fontSize = 28.sp)
-
-                }
-        }
+fun City(){
+    val towns = listOf("Kyiv","Lviv","Odesa",
+        "Kharkiv","Dnipro","Zaporizhzhia","Donetsk",
+        "Luhansk","Vinnytsia","Chernivtsi","Ternopil",
+        "Ivano-Frankivsk","Sumy","Poltava","Cherkasy",
+        "Rivne","Khmelnytskyi","Zhytomyr","Chernihiv",
+        "Uzhhorod","Lutsk","Kropyvnytskyi","Kremenchuk")
+    LazyColumn(
+        Modifier.fillMaxSize()
+    ){
+        listHeader(text = "Cities of Ukraine")
+        items(towns){town -> Text(town, fontSize = 24.sp) }
+    }
+}
+@OptIn(ExperimentalFoundationApi::class)
+fun LazyListScope.listHeader(text: String) {
+    stickyHeader {
+        Text(
+            text = text,
+            fontSize = 30.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(all = 16.dp)
+        )
     }
 }
 
 sealed class NavRoutes(val route: String) {
-    object Today: NavRoutes("today")
-    object Week: NavRoutes("week")
-    object City: NavRoutes("city")
+    object Add : NavRoutes("add")
+    object Weather : NavRoutes("weather")
+    object City : NavRoutes("city")
 }
