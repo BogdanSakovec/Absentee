@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.annotation.Nullable
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -60,12 +61,15 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,15 +84,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.dataStore
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -96,18 +103,29 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Main ()
-
         }
     }
 }
+
 @Composable
 fun Main() {
     val navController = rememberNavController()
     Column(Modifier.padding(8.dp)) {
         NavHost(navController, startDestination = NavRoutes.
         Add.route, modifier = Modifier.weight(1f)) {
-            composable(NavRoutes.Add.route) { Add() }
-            composable(NavRoutes.Weather.route) { Weather() }
+            composable(NavRoutes.Add.route) { Add(navController) }
+            composable("Weather?name={name}",
+                arguments = listOf(
+                    navArgument(name = "message"){
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ){backstackEntry->
+                Weather(
+                    myName = backstackEntry.arguments?.getString("name").toString()
+                )
+            }
             composable(NavRoutes.City.route) { City() }
         }
         BottomNavigationBar(navController = navController)
@@ -119,7 +137,6 @@ fun BottomNavigationBar(navController: NavController) {
     NavigationBar {
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = backStackEntry?.destination?.route
-
         NavBarItems.BarItems.forEach { navItem ->
             NavigationBarItem(
                 selected = currentRoute == navItem.route,
@@ -170,25 +187,32 @@ data class BarItem(
 )
 
 @Composable
-fun Add(){
-    Text("Add Page", fontSize = 30.sp)
-    val message = remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ){
-        Text(message.value, fontSize = 28.sp)
-        TextField(
-            value = message.value,
+fun Add(navController: NavHostController){
+    Column{
+        var message by remember { mutableStateOf("") }
+        Text("Add Page", fontSize = 30.sp)
+        Text(text = "Town ${message}", fontSize = 28.sp)
+        OutlinedTextField(
+            value = message,
             textStyle = TextStyle(fontSize = 25.sp),
-            onValueChange = {newText -> message.value = newText}
+            onValueChange = {message = it},
+            placeholder = {
+                Text(text = "enter your city")
+            }
         )
+        Button(onClick = {
+            navController.navigate("Weather?name=$message")
+        }) {
+            Text(text = "Pass data", fontSize = 30.sp)
+        }
     }
 }
 @Composable
-fun Weather(){
-    Text("Weather Page", fontSize = 30.sp)
+fun Weather(myName:String){
+    Column {
+        Text("Weather Page", fontSize = 30.sp)
+        Text("Your city $myName", fontSize = 28.sp)
+    }
 }
 @Composable
 fun City(){
