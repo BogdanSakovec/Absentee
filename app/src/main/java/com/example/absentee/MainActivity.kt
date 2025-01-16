@@ -1,15 +1,11 @@
 package com.example.absentee
 
-import android.app.ActionBar.Tab
-import android.content.ClipData.Item
+import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.annotation.Nullable
-import androidx.annotation.StringRes
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,92 +13,50 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.modifier.modifierLocalMapOf
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.dataStore
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import kotlinx.coroutines.launch
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import org.json.JSONObject
 
+const val API_KEY = "4d55df4378394db1a0a142718251201"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            Main ()
+            Main()
+            Greeting("Lutsk", this)
         }
     }
 }
@@ -111,140 +65,166 @@ class MainActivity : ComponentActivity() {
 fun Main() {
     val navController = rememberNavController()
     Column(Modifier.padding(8.dp)) {
-        NavHost(navController, startDestination = NavRoutes.
-        Add.route, modifier = Modifier.weight(1f)) {
-            composable(NavRoutes.Add.route) { Add(navController) }
-            composable("Weather?name={name}",
-                arguments = listOf(
-                    navArgument(name = "message"){
-                        type = NavType.StringType
-                        nullable = true
-                    }
-                )
-            ){backstackEntry->
-                Weather(
-                    myName = backstackEntry.arguments?.getString("name").toString()
-                )
-            }
-            composable(NavRoutes.City.route) { City() }
-        }
-        BottomNavigationBar(navController = navController)
-    }
-}
-
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    NavigationBar {
-        val backStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = backStackEntry?.destination?.route
-        NavBarItems.BarItems.forEach { navItem ->
-            NavigationBarItem(
-                selected = currentRoute == navItem.route,
-                onClick = {
-                    navController.navigate(navItem.route) {
-                        popUpTo(navController.graph.findStartDestination().id)
-                        {saveState = true}
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(imageVector = navItem.image,
-                        contentDescription = navItem.title)
-                },
-                label = {
-                    Text(text = navItem.title)
-                }
-            )
+        NavBar(navController = navController)
+        NavHost(navController, startDestination = NavRoutes.Weather.route) {
+            composable(NavRoutes.Weather.route) { Weather() }
+            composable(NavRoutes.Add.route) { Add()  }
+            composable(NavRoutes.Town.route) { Town() }
         }
     }
 }
 
-object NavBarItems {
-    val BarItems = listOf(
-        BarItem(
-            title = "Add",
-            image = Icons.Filled.Add,
-            route = "Add"
-        ),
-        BarItem(
-            title = "Weather",
-            image = Icons.Filled.Star,
-            route = "Weather"
-        ),
-        BarItem(
-            title = "City",
-            image = Icons.Filled.LocationOn,
-            route = "City"
-        ),
-    )
-}
-
-data class BarItem(
-    val title: String,
-    val image: ImageVector,
-    val route: String
-)
-
 @Composable
-fun Add(navController: NavHostController){
-    Column{
-        var message by remember { mutableStateOf("") }
-        Text("Add Page", fontSize = 30.sp)
-        Text(text = "Town ${message}", fontSize = 28.sp)
-        OutlinedTextField(
-            value = message,
-            textStyle = TextStyle(fontSize = 25.sp),
-            onValueChange = {message = it},
-            placeholder = {
-                Text(text = "enter your city")
-            }
-        )
-        Button(onClick = {
-            navController.navigate("Weather?name=$message")
-        }) {
-            Text(text = "Pass data", fontSize = 30.sp)
-        }
-    }
-}
-@Composable
-fun Weather(myName:String){
+fun NavBar(navController: NavController){
+    Spacer(modifier = Modifier.height(40.dp))
     Column {
-        Text("Weather Page", fontSize = 30.sp)
-        Text("Your city $myName", fontSize = 28.sp)
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly)
+        {
+            Box(modifier = Modifier.background(Color.Blue).height(30.dp).width(100.dp)){
+                Text("ПОГОДА",
+                    Modifier.clickable { navController.navigate(NavRoutes.Weather.route) },
+                    fontSize = 22.sp, color= Color.White)
+            }
+            Box(modifier = Modifier.background(Color.Blue).height(30.dp).width(100.dp)){
+                Text("ДОДАТИ",
+                    Modifier.clickable { navController.navigate(NavRoutes.Add.route) },
+                    fontSize = 22.sp, color= Color.White)
+            }
+            Box(modifier = Modifier.background(Color.Blue).height(30.dp).width(100.dp)){
+                Text("МІСТА",
+                    Modifier.clickable { navController.navigate(NavRoutes.Town.route) },
+                    fontSize = 22.sp, color= Color.White)
+            }
+        }
     }
 }
+
 @Composable
-fun City(){
-    val towns = listOf("Kyiv","Lviv","Odesa",
-        "Kharkiv","Dnipro","Zaporizhzhia","Donetsk",
-        "Luhansk","Vinnytsia","Chernivtsi","Ternopil",
-        "Ivano-Frankivsk","Sumy","Poltava","Cherkasy",
-        "Rivne","Khmelnytskyi","Zhytomyr","Chernihiv",
-        "Uzhhorod","Lutsk","Kropyvnytskyi","Kremenchuk")
-    LazyColumn(
-        Modifier.fillMaxSize()
-    ){
-        listHeader(text = "Cities of Ukraine")
-        items(towns){town -> Text(town, fontSize = 24.sp) }
+fun Weather(){
+    Column {
+        Text("ПОГОДА", fontSize = 30.sp)
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
-@OptIn(ExperimentalFoundationApi::class)
-fun LazyListScope.listHeader(text: String) {
-    stickyHeader {
-        Text(
-            text = text,
-            fontSize = 30.sp,
+
+@Composable
+fun Greeting(name: String, context: Context) {
+    val state = remember {
+        mutableStateOf("Unknown")
+    }
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Spacer(modifier = Modifier.height(150.dp))
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(all = 16.dp)
-        )
+                .fillMaxHeight(0.1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Температура повітря в $name: ${state.value} Cº",
+                fontSize = 30.sp)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxHeight(0.1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(onClick = {
+                getData(name, context, state)
+            }, modifier = Modifier.fillMaxWidth().padding(5.dp)) {
+                Text(text = "Взнати погоду")
+            }
+        }
+    }
+}
+
+fun getData(name: String, context: Context, mState: MutableState<String>){
+    val url = "https://api.weatherapi.com/v1/current.json" +
+            "?key=$API_KEY&" +
+            "q=$name" +
+            "&aqi=no"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = StringRequest(
+        Request.Method.GET,
+        url,
+        {
+                response->
+            val obj = JSONObject(response)
+            val temp = obj.getJSONObject("current")
+            mState.value = temp.getString("temp_c")
+            Log.d("MyLog","Response: ${temp.getString("temp_c")}")
+        },
+        {
+            Log.d("MyLog","Volley error: $it")
+        }
+    )
+    queue.add(stringRequest)
+}
+
+@Composable
+fun Add(vm: UserListViewModel = viewModel()){
+    Column {
+        Spacer(modifier = Modifier.height(200.dp))
+        UserData(vm.userName, changeName = {vm.changeName(it)}, add={vm.addUser()})
+        UserList(users = vm.users, delete = {vm.deleteUser(it)})
+    }
+
+    Text("ДОДАТИ", fontSize = 30.sp)
+}
+
+@Composable
+fun Town(vm: UserListViewModel = viewModel()){
+    Column {
+        Spacer(modifier = Modifier.height(200.dp))
+        UserList(users = vm.users, delete = {vm.deleteUser(it)})
+    }
+    Text("МІСТА", fontSize = 30.sp)
+}
+
+data class User(val name: String)
+class UserListViewModel: ViewModel() {
+
+    val users = mutableStateListOf<User>(User("Lutsk"),
+        User("Lviv"))
+    var userName by mutableStateOf("")
+    fun addUser(){
+        users.add(User(userName)) }
+    fun changeName(value: String){
+        userName = value }
+    fun deleteUser(user: User){
+        users.remove(user)
+    }
+}
+
+@Composable
+fun UserList(users:List<User>, delete:(User)->Unit) {
+    LazyColumn(Modifier.fillMaxWidth()) {
+        items(users) {u ->
+            Text(u.name, Modifier.padding(start=12.dp), fontSize = 25.sp)
+            TextButton(onClick = {delete(u)}) {
+                Text("Delete", fontSize = 22.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun UserData(userName: String, changeName:(String)->Unit, add:()->Unit){
+    Column{
+        OutlinedTextField(value = userName, modifier=Modifier.padding(8.dp),
+            label = {Text("Введіть назву міста")}, onValueChange = {changeName(it)})
+        Button(onClick = { add() }, Modifier.padding(8.dp)) {
+            Text("Додати", fontSize = 22.sp)
+        }
     }
 }
 
 sealed class NavRoutes(val route: String) {
-    object Add : NavRoutes("add")
     object Weather : NavRoutes("weather")
-    object City : NavRoutes("city")
+    object Add : NavRoutes("add")
+    object Town : NavRoutes("town")
 }
